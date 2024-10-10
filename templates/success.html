@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Pago completado exitosamente!</title>
+    <link rel="stylesheet" href="/static/styles.css"> <!-- Cambia a esta ruta -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="/static/logo.png" alt="Logo Hanami Psicología" class="logo"> <!-- Cambia a esta ruta -->
+            <h1>¡Pago completado exitosamente!</h1>
+        </header>
+        <main>
+            <p class="thank-you">Gracias por su reserva, <strong id="customer-name"></strong>.</p>
+            <p class="message">Hemos recibido su pago y su cita ha sido confirmada. Recibirá un correo electrónico con los detalles de su reserva.</p>
+            <a href="/" class="button">Volver a la página principal</a>
+        </main>
+        <footer>
+            <p>© 2024 Hanami Psicología. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const nombre = urlParams.get('nombre');
+        const apellidos = urlParams.get('apellidos');
+        document.getElementById('customer-name').innerText = `${nombre} ${apellidos}`;
+    </script>
+</body>
+</html>
