@@ -1,8 +1,0 @@
-streamlit 
-smtplib
-gspread
-flask
-stripe
-streamlit-option-menu
-gspread
-oauth2client
