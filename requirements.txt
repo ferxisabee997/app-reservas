@@ -2,5 +2,5 @@ streamlit==1.35.0
 streamlit_option_menu==0.3.13
 google-api-python-client==2.138.0
 google-auth==2.22.0  # Asegúrate de usar la versión correcta
-numpy==2.1.2
+numpy==1.24.3
 stripe==11.1.0
