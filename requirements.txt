@@ -11,10 +11,9 @@ google_api_python_client==2.138.0
 gspread==6.1.3
 HTMLParser==0.0.2
 ipython==8.12.3
-Cython==3.0.11
 ipywidgets==8.1.5
 Jinja2==3.1.4
-jnius==1.1.0
+jnius==1.1.0  # Consider trying a different version if this continues to fail
 keyring==25.4.1
 mock==5.1.0
 numpy==2.1.2
@@ -33,5 +32,3 @@ tornado==6.4.1
 trove_classifiers==2024.9.12
 urllib3_secure_extra==0.1.0
 xmlrpclib==1.0.1
-
-
