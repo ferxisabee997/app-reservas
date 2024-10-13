@@ -2,7 +2,7 @@ attr==0.3.2
 ConfigParser==7.1.0
 contextlib2==21.6.0
 cryptography==43.0.1
-Cython==3.0.11
+Cython==3.0.11  # Asegúrate de que esta línea esté antes de jnius
 dl==0.1.0
 docutils==0.21.2
 filelock==3.16.1
@@ -13,7 +13,7 @@ HTMLParser==0.0.2
 ipython==8.12.3
 ipywidgets==8.1.5
 Jinja2==3.1.4
-jnius==1.0.0  # Consider trying a different version if this continues to fail
+jnius==1.1.0  # Mantén esto después de Cython
 keyring==25.4.1
 mock==5.1.0
 numpy==2.1.2
