@@ -131,7 +131,7 @@ if selected == "Reservar":
                             'quantity': 1,
                         }],
                         mode='payment',
-                        success_url=f'http://localhost:8501/?session_id={{CHECKOUT_SESSION_ID}}&nombre={nombre}&apellidos={apellidos}&email={email}&telefono={telefono}&fecha={fecha}&hora={hora}&notas={notas}',
+                        success_url=f'http://127.0.0.1:5500/templates/success.html?session_id={{CHECKOUT_SESSION_ID}}&nombre={nombre}&apellidos={apellidos}&email={email}&telefono={telefono}&fecha={fecha}&hora={hora}&notas={notas}',
                         cancel_url='https://tu-web.com/cancel',  # Cambia esto a tu URL de cancelación
                     )
 
