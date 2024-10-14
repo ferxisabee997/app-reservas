@@ -14,14 +14,47 @@ import os
 page_title = 'Reservas Hanami Psicología'
 page_icon = 'assets/logo.png'
 layout = 'centered'
-
 st.set_page_config(page_title=page_title, page_icon=page_icon, layout=layout)
 
+# Función para cargar el CSS
 def load_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-load_css(os.path.join('static', 'style.css'))
+load_css(os.path.join('static', 'estilo.css'))  # Asegúrate de que la ruta sea correcta
+
+# CSS para el botón
+st.markdown("""
+    <style>
+        .btn-pagar {
+            display: inline-block; 
+            padding: 10px 20px; 
+            background-color: #FF8D87; 
+            color: white; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            text-align: center; 
+            transition: background-color 0.3s; /* Transición suave */
+            border: none; /* Elimina el borde */
+        }
+
+        .btn-pagar:hover {
+            background-color: #ffa19c; /* Color de fondo al pasar el cursor */
+        }
+
+        /* Asegurarse de que no haya estilos por defecto para los enlaces */
+        a.btn-pagar {
+            color: white; /* Color del texto */
+            cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+        }
+
+        a.btn-pagar:visited, a.btn-pagar:focus {
+            color: white; /* Color del texto para enlaces visitados */
+            text-decoration: none; /* Elimina el subrayado */
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 horas = ["09:00", "10:00", "11:00", "12:00", "13:00",
          "15:00", "16:00", "17:00", "18:00", "19:00"]
@@ -52,7 +85,7 @@ def es_dia_habil(fecha):
 
 st.image("assets/logo.png")
 st.title("Reserva tu cita")
-st.text("C. Gregorio Pérez de María ''El Cainejo'', 6")
+st.text("C. Gregorio Pérez de María 'El Cainejo', 6")
 
 selected = option_menu(menu_title=None, options=["Reservar", "Detalles"],
                        icons=["calendar2-plus", "book-half"],
@@ -130,13 +163,20 @@ if selected == "Reservar":
                             'quantity': 1,
                         }],
                         mode='payment',
-                        success_url=f'http://127.0.0.1:5500/templates/success.html?session_id={{CHECKOUT_SESSION_ID}}&nombre={nombre}&apellidos={apellidos}&email={email}&telefono={telefono}&fecha={fecha}&hora={hora}&notas={notas}',
+                        success_url=f'http://localhost:8501/?session_id={{CHECKOUT_SESSION_ID}}&nombre={nombre}&apellidos={apellidos}&email={email}&telefono={telefono}&fecha={fecha}&hora={hora}&notas={notas}',
                         cancel_url='https://tu-web.com/cancel',  # Cambia esto a tu URL de cancelación
                     )
 
                     # Redirigir al usuario a la página de pago
                     if session.url:
-                        st.markdown(f"Para completar tu reserva, haz clic en el siguiente enlace para pagar: [Pagar ahora]({session.url})")
+                        st.markdown(f"""
+                        <div style="padding: 10px; text-align: center;">
+                            <p>Para completar tu reserva, haz clic en el siguiente botón para pagar:</p>
+                            <a href="{session.url}" class="btn-pagar">
+                                Pagar ahora
+                            </a>
+                        </div>
+                    """, unsafe_allow_html=True)
                         st.success("Por favor completa el pago para finalizar la reserva.")
                     else:
                         st.error("Hubo un problema al crear la sesión de pago. Intenta nuevamente.")
@@ -167,27 +207,22 @@ if 'session_id' in st.query_params:
         if checkout_session.payment_status == "paid":
             # Crear evento en Google Calendar
             parsed_time = dt.datetime.strptime(hora, "%H:%M").time()
-            start_time = dt.datetime.combine(fecha, parsed_time).strftime('%Y-%m-%dT%H:%M:%S')
-            end_time_str = add_fifty_minutes(hora)
-            end_time = dt.datetime.combine(fecha, dt.datetime.strptime(end_time_str, "%H:%M").time()).strftime('%Y-%m-%dT%H:%M:%S')
-
-            # Crear el evento en Google Calendar
+            start_time = dt.datetime.combine(fecha, parsed_time)
+            end_time = dt.datetime.combine(fecha, add_fifty_minutes(hora))
             calendar = GoogleCalendar(credentials, idcalendar)
-            calendar.create_event(nombre, start_time, end_time, time_zone)
+            calendar.create_event(start_time, end_time, f"Cita con {nombre} {apellidos}", notas)
 
-            # Guardar la reserva en Google Sheets
-            uid = generate_uid()
-            data = [[nombre, apellidos, email, telefono, str(fecha), hora, notas, uid]]
+            # Enviar correo electrónico de confirmación
             gs = GoogleSheets(credentials, document, sheet)
-            range = gs.get_last_row_range()
-            gs.write_data(range, data)
+            gs.append_data([[nombre, apellidos, email, telefono, fecha, hora, notas]])
 
-            # Enviar correo de confirmación
-            send(email, nombre, apellidos, fecha, hora, telefono)
+            # Enviar correo
+            send(nombre, apellidos, email, telefono, fecha, hora, notas)
 
-            # Mensaje final de éxito
-            st.success("Cita reservada con éxito.")
+            st.success("Tu reserva ha sido confirmada.")
+            st.markdown(f"<a href='https://hanamipsicologia.es/'><img src='assets/logo.png' alt='Logo' style='width: 150px;'></a>", unsafe_allow_html=True)
+            st.markdown(f"<a href='https://hanamipsicologia.es/' style='text-decoration: none;'>Volver a la página principal</a>", unsafe_allow_html=True)
         else:
-            st.error("El pago no fue exitoso.")
+            st.error("El pago no fue exitoso. Por favor intenta nuevamente.")
     except Exception as e:
-        st.error(f"Error al recuperar la sesión de pago: {e}")
+        st.error(f"Error al verificar el pago: {e}")

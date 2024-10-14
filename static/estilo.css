@@ -1,0 +1,70 @@
+body {
+    font-family: 'Roboto', sans-serif; /* Manteniendo la fuente Roboto */
+    margin: 0;
+    padding: 0;
+    background-color: #FFE0D9; /* Color de fondo suave */
+    display: flex; /* Usamos flexbox para centrar */
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente */
+    height: 100vh; /* Altura completa de la ventana */
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto; /* Centrar horizontalmente */
+    padding: 20px;
+    background-color: #ffffff; /* Fondo blanco para la tarjeta */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra más suave */
+    border-radius: 10px; /* Bordes redondeados */
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px; /* Espacio más amplio */
+}
+
+.logo {
+    max-width: 200px; /* Tamaño del logo */
+}
+
+h1 {
+    color: #FF8D87; /* Color rosa intenso */
+    font-size: 2.5em; /* Tamaño de fuente más grande */
+    margin: 0; /* Sin márgenes */
+}
+
+.thank-you {
+    font-size: 1.8em; /* Tamaño de fuente más grande */
+    color: #FF8D87; /* Color rosa intenso */
+    text-align: center;
+}
+
+.message {
+    text-align: center;
+    margin: 20px 0;
+    color: #555555; /* Color gris oscuro */
+}
+
+.button {
+    display: block; /* Cambiado a block para centrarlo */
+    padding: 10px 15px; /* Ajusta el relleno para hacerlo más corto */
+    background-color: #FF8D87; /* Color rosa intenso para el botón */
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 30px auto; /* Margin automático para centrar */
+    font-weight: bold; /* Texto en negrita */
+    text-align: center; /* Centrar texto dentro del botón */
+    max-width: 200px; /* Ancho máximo del botón */
+}
+
+.button:hover {
+    background-color: #FF6B61; /* Color rosa intenso oscuro al pasar el ratón */
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.9em; /* Tamaño de fuente ligeramente más grande */
+    color: #7f8c8d; /* Color gris claro */
+}
