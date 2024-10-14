@@ -48,7 +48,7 @@ def add_fifty_minutes(time):
     return new_time.strftime("%H:%M")
 
 def es_dia_habil(fecha):
-    return fecha.weekday() < 5
+    return fecha.weekday() < 5  # Retorna True si es un día de lunes a viernes
 
 st.image("assets/logo.png")
 st.title("Reserva tu cita")
@@ -88,19 +88,18 @@ if selected == "Reservar":
 
     if not es_dia_habil(fecha):
         st.error("Por favor selecciona un día de lunes a viernes.")
+        Enviar = st.button("Reservar", disabled=True)  # Botón deshabilitado
     else:
         # Obtener horas bloqueadas solo si es un día hábil
         calendar = GoogleCalendar(credentials, idcalendar)
         hours_blocked = calendar.get_events_start_time(str(fecha))
         result_hours = np.setdiff1d(horas, hours_blocked)
+        hora = c2.selectbox("Hora", result_hours if len(result_hours) > 0 else horas)
 
-    if fecha:
-        hora = c2.selectbox("Hora", result_hours if 'result_hours' in locals() else horas)
+        notas = c1.text_area("Notas")
+        Enviar = st.button("Reservar")  # Botón habilitado
 
-    notas = c1.text_area("Notas")
-    Enviar = st.button("Reservar")
-
-    # Proceso de pago
+    # Proceso de pago solo si el día es hábil y el botón está habilitado
     if Enviar:
         with st.spinner("Cargando..."):
             if not all([nombre, apellidos, telefono, email]):
