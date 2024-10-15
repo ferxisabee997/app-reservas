@@ -113,24 +113,35 @@ if selected == "Reservar":
     st.subheader("Reservar")
 
     c1, c2 = st.columns(2)
-    nombre = c1.text_input("Tu nombre*")
-    apellidos = c2.text_input("Tus apellidos*")
-    email = c1.text_input("Tu email*")
-    telefono = c2.text_input("Teléfono*")
-    fecha = c1.date_input("Fecha", min_value=dt.date.today() + dt.timedelta(days=1))  # Aumentar en un día
 
-    if not es_dia_habil(fecha):
-        st.error("Por favor selecciona un día de lunes a viernes.")
-        Enviar = st.button("Reservar", disabled=True)  # Botón deshabilitado
-    else:
-        # Obtener horas bloqueadas solo si es un día hábil
-        calendar = GoogleCalendar(credentials, idcalendar)
-        hours_blocked = calendar.get_events_start_time(str(fecha))
-        result_hours = np.setdiff1d(horas, hours_blocked)
-        hora = c2.selectbox("Hora", result_hours if len(result_hours) > 0 else horas)
+# Campos de entrada
+with c1:
+    nombre = st.text_input("Tu nombre*")
+    apellidos = st.text_input("Tus apellidos*")
+    email = st.text_input("Tu email*")
+    telefono = st.text_input("Teléfono*")
 
-        notas = c1.text_area("Notas")
-        Enviar = st.button("Reservar")  # Botón habilitado
+with c2:
+
+    fecha = st.date_input("Fecha", min_value=dt.date.today() + dt.timedelta(days=1))  # Aumentar en un día
+    
+
+# Comprobar si la fecha seleccionada es hábil
+if not es_dia_habil(fecha):
+    st.error("Por favor selecciona un día de lunes a viernes.")
+    Enviar = st.button("Reservar", disabled=True)  # Botón deshabilitado
+else:
+    # Obtener horas bloqueadas solo si es un día hábil
+    calendar = GoogleCalendar(credentials, idcalendar)
+    hours_blocked = calendar.get_events_start_time(str(fecha))
+    result_hours = np.setdiff1d(horas, hours_blocked)
+
+    # Seleccionar hora
+    hora = c2.selectbox("Hora", result_hours if len(result_hours) > 0 else horas)
+    notas = c2.text_area("Notas")
+
+    # Botón habilitado
+    Enviar = st.button("Reservar")
 
     # Proceso de pago solo si el día es hábil y el botón está habilitado
     if Enviar:
