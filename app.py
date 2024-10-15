@@ -227,6 +227,12 @@ if 'session_id' in st.query_params:
                     attendes=[email]  # Aquí puedes agregar más correos electrónicos si es necesario
                 )
 
+                uid = generate_uid()
+                data = [[nombre, apellidos, email,telefono, str(fecha), hora, notas, uid]]
+                gs = GoogleSheets(credentials, document, sheet)
+                range = gs.get_last_row_range()
+                gs.write_data(range, data)
+
                 # Enviar correo de confirmación
                 send(email, nombre, apellidos, fecha, hora, telefono)
                 
