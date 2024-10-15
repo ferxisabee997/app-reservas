@@ -163,7 +163,7 @@ if selected == "Reservar":
                             'quantity': 1,
                         }],
                         mode='payment',
-                        success_url=f'http://localhost:8501/?session_id={{CHECKOUT_SESSION_ID}}&nombre={nombre}&apellidos={apellidos}&email={email}&telefono={telefono}&fecha={fecha}&hora={hora}&notas={notas}',
+                        success_url=f'https://app-reservas-vkv2wzmmgqkriylvwn7akc.streamlit.app/?session_id={{CHECKOUT_SESSION_ID}}&nombre={nombre}&apellidos={apellidos}&email={email}&telefono={telefono}&fecha={fecha}&hora={hora}&notas={notas}',
                         cancel_url='https://tu-web.com/cancel',  # Cambia esto a tu URL de cancelación
                     )
 
@@ -183,6 +183,7 @@ if selected == "Reservar":
                 except Exception as e:
                     st.error(f"Error durante la creación de cliente o sesión en Stripe: {e}")
 
+# Lógica para verificar el pago y crear la cita
 # Lógica para verificar el pago y crear la cita
 if 'session_id' in st.query_params:
     session_id = st.query_params['session_id']
@@ -207,21 +208,45 @@ if 'session_id' in st.query_params:
         if checkout_session.payment_status == "paid":
             # Crear evento en Google Calendar
             parsed_time = dt.datetime.strptime(hora, "%H:%M").time()
-            start_time = dt.datetime.combine(fecha, parsed_time)
-            end_time = dt.datetime.combine(fecha, add_fifty_minutes(hora))
+            start_time = dt.datetime.combine(fecha, parsed_time).strftime('%Y-%m-%dT%H:%M:%S')
+            end_time_str = add_fifty_minutes(hora)
+            end_time = dt.datetime.combine(fecha, dt.datetime.strptime(end_time_str, "%H:%M").time()).strftime('%Y-%m-%dT%H:%M:%S')
+
+            # Lógica para enviar correo electrónico
+            uid = generate_uid()
+            data = [[nombre, apellidos, email, telefono, str(fecha), hora, notas, uid]]
+            
+            # Crear el evento
             calendar = GoogleCalendar(credentials, idcalendar)
-            calendar.create_event(start_time, end_time, f"Cita con {nombre} {apellidos}", notas)
+            try:
+                calendar.create_event(
+                    name_event=f'Cita con {nombre} {apellidos}',
+                    start_time=start_time,
+                    end_time=end_time,
+                    timezone=time_zone,
+                    attendes=[email]  # Aquí puedes agregar más correos electrónicos si es necesario
+                )
 
-            # Enviar correo electrónico de confirmación
-            gs = GoogleSheets(credentials, document, sheet)
-            gs.append_data([[nombre, apellidos, email, telefono, fecha, hora, notas]])
+                # Enviar correo de confirmación
+                send(email, nombre, apellidos, fecha, hora, telefono)
+                
+                # Mostrar mensaje de éxito
+                st.markdown(f"""
+                    <div class="container">
+                        <header>
+                            <img src="https://hanamipsicologia.es/wp-content/uploads/2023/12/pSICOLOGIA-22.png" alt="Logo" class="logo">
+                            <h1>¡Cita reservada con éxito!</h1>
+                        </header>
+                        <div class="thank-you">Gracias {nombre} {apellidos} nos vemos en la proxima cita</div>
+                        <div class="message">Tu cita ha sido confirmada para el {fecha} a las {hora}.</div>
+                        <a href="https://hanamipsicologia.es/" class="button">Volver al inicio</a>
 
-            # Enviar correo
-            send(nombre, apellidos, email, telefono, fecha, hora, notas)
+                    </div>
+                """, unsafe_allow_html=True)
+                
+            except Exception as e:
+                st.error(f"Error al crear la cita en Google Calendar o enviar el correo: {e}")
 
-            st.success("Tu reserva ha sido confirmada.")
-            st.markdown(f"<a href='https://hanamipsicologia.es/'><img src='assets/logo.png' alt='Logo' style='width: 150px;'></a>", unsafe_allow_html=True)
-            st.markdown(f"<a href='https://hanamipsicologia.es/' style='text-decoration: none;'>Volver a la página principal</a>", unsafe_allow_html=True)
         else:
             st.error("El pago no fue exitoso. Por favor intenta nuevamente.")
     except Exception as e:
